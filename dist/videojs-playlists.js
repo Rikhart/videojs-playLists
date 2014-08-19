@@ -1,8 +1,8 @@
 /*!
  * videojs-playlists - Playlists done right for Videojs
- * v0.1.1
+ * v0.2.0
  * 
- * copyright Antonio Laguna 2013
+ * copyright Antonio Laguna 2014
  * MIT License
 */
 //videojs-playlists.js
@@ -18,8 +18,15 @@ function playList(options,arg){
       'ogv' : 'video/ogg'
     };
     var extension = video.split('.').pop();
-
-    return videoTypes[extension] || '';
+    if(videoTypes[extension]){
+      return videoTypes[extension];
+    }
+    else if(video.indexOf('youtube') > -1 || video.indexOf('youtu.be') > -1){
+        return 'video/youtube';
+        }
+    else {
+       return '';
+    }
   };
 
   player.pl.init = function(videos, options) {
@@ -100,7 +107,9 @@ function playList(options,arg){
 
   player.pl._resumeVideo = function(){
     player.one('loadstart',function(){
-      player.play();
+      if(player.tech && player.paused()===true){
+        player.play();
+      }
     });
   };
 
@@ -109,8 +118,8 @@ function playList(options,arg){
       player.trigger('lastVideoEnded');
     }
     else {
-      player.pl._resumeVideo();
       player.next();
+      player.pl._resumeVideo();
     }
   };
 
